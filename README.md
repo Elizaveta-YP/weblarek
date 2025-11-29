@@ -98,3 +98,76 @@ Presenter - презентер содержит основную логику п
 `emit<T extends object>(event: string, data?: T): void` - инициализация события. При вызове события в метод передается название события и объект с данными, который будет использован как аргумент для вызова обработчика.  
 `trigger<T extends object>(event: string, context?: Partial<T>): (data: T) => void` - возвращает функцию, при вызове которой инициализируется требуемое в параметрах событие с передачей в него данных из второго параметра.
 
+##### Данные
+
+# Каталог товаров
+Хранит массив всех товаров.
+Хранит товар, выбранный для подробного отображения.
+Хранит следующие данные:
+interface ProductCatalog {
+    id: string;
+    description: string;
+    image: string;
+    title: string;
+    category: string;
+    price: number | null;
+} 
+- `id` - id каждого товара.
+- `description` - описание товара при открытом модальном окне.
+- `image` - картинка товара.
+- `title` - название товара.
+- `category` - категория товара.
+- `price` - цена товара, значение может быть бесценное.
+
+# Корзина 
+Хранит массив товаров, выбранных покупателем для покупки.
+
+# Покупатель
+Хранит следующие данные:
+interface Buyer {
+    payment: string;
+    email: string;
+    phone: string;
+    address: string;
+}
+- `payment` - способ оплаты, может быть card | cash | ''.
+- `email` - электронная почта покупателя.
+- `phone` - номер телефона покупателя.
+- `address` - адрес покупателя.
+
+
+###### Модели данных 
+
+# Методы каталога товаров
+  методы:
+  - setProducts(products: ProductCatalog[]): void - сохранение массива товаров полученного в параметрах метода.
+  - getProducts(): ProductCatalog[] - получение массива товаров из модели.
+  - getSelected(): ProductCatalog | null - получение товара для подробного отображения. 
+  - setSelected(product: ProductCatalog): void - сохранение товара для подробного отображения.
+  - getProductById(id: string): ProductCatalog | undefined - получение одного товара по его id.
+
+ # Методы корзины
+ методы:
+ - getItems(): ProductCatalog - получение массива товаров в корзине.
+ - addItem(product: ProductCatalog): void - добавление товара в массив корзины.
+ - remove(id: string): void - удаление товара из массива корзины.
+ - clear(): void - очистка корзины.
+ - getTotal(): number - стоимость всех товаров в массиве.
+ - getCount(): number - количество товаров в массиве.
+ - hasItem(id: string): boolean - проверка наличия товара в корзине по его id, полученного в параметр метода.
+
+# Методы покупателя
+методы:
+ - setBuyerNotis(data: Partial<BuyerType>): void - сохранение данных в модели.
+ - getBuyerNotis(): Partial<BuyerType> - получение всех данных покупателя.
+ - clearBuyerNotis(): void - очистка данных покупателя.
+ - validateBuyerNotis(): ValidationErrors - валидация данных. 
+
+ # Слой коммуникации
+
+ # Класс ApiService
+ Использует композицию, чтобы выполнить запрос на сервер с помощью метода get класса Api и получает с сервера объект с массивом товаров.
+
+ # Методы ApiService
+ - fetchProducts():Promise<ProductCatalog> - делает get запрос на эндпоинт /product/ и возвращает массив товаров.
+ - sendOrder(orderData: IOrder)Promise - делает post запрос на эндпоинт /order/ и передаёт в него данные, полученные в параметрах метода.
