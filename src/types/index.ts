@@ -22,3 +22,19 @@ export interface Buyer {
     phone: string;
     address: string;
 }
+
+// Форматы объектов обмена с API
+export interface IProductListResponse {
+    total: number;
+    items: ProductCatalog[];
+}
+
+export interface IOrderRequest extends Buyer {
+    total: number;
+    items: string[]; 
+}
+
+export interface IOrderResponse {
+    id: string;
+    total: number;
+}
