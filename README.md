@@ -171,3 +171,144 @@ interface Buyer {
  # Методы ApiService
  - fetchProducts():Promise<ProductCatalog> - делает get запрос на эндпоинт /product/ и возвращает массив товаров.
  - sendOrder(orderData: IOrder)Promise - делает post запрос на эндпоинт /order/ и передаёт в него данные, полученные в параметрах метода.
+
+ ###### Слой представления
+
+ <!-- ### Класс CardComponent.
+Абстрактный компонент для работы с карточками товаров.
+# Конструктор:
+- constructor(container: HTMLElement) 
+# CardComponent имеет поля:
+- titleElement: HTMLElement — заголовок. 
+- priceElement: HTMLElement — цена.
+# Методы CardComponent:
+- render - отрисовка карточки. -->
+
+ ### Класс FormComponent.
+ Абстрактный компонент для работы с формами.
+ # Конструктор:
+ - constructor(container: HTMLElement)
+ # FormComponent имеет поля:
+ - _form: HTMLFormElement - элемент.
+ - _errors: HTMLElement - ошибка валидации. 
+ - _submitButton: HTMLButtonElement - отправка формы.
+ # Методы FormComponent:
+ - set valid(value: boolean) - состояние кнопки.
+ - set errors(value: string[]) - ошибка валидации.
+
+## 1.Класс Header.
+# Конструктор:
+- constructor(events: IEvents, container: HTMLElement)
+# Header имеет поля:
+- counterElement: HTMLElement - счетчик товаров в корзине.
+- basketButton: HTMLButtonElement - кнопка корзины.
+# Методы Header:
+- set counter(value: number) - значение счетчика товаров в корзине.
+
+## 2.Класс Gallery.
+# Конструктор:
+- constructor(container: HTMLElement)
+# Gallery имеет поля:
+- catalogElement: HTMLElement - контейнер для товаров.
+# Методы Gallery:
+- set catalog(items: HTMLElement[]) - массив элементов карточек для отображения их в галерее.
+
+## 3.Класс Modal.
+# Конструктор:
+- constructor(events: IEvents, container: HTMLElement)
+# Modal имеет поля:
+closeButton: HTMLButtonElement - кнопка закрытия.
+content: HTMLElement - содержимое.
+# Методы Modal:
+- get isOpen(): boolean - состояние (открыто или закрыто).
+- set content(value: HTMLElement) - содержимое.
+- open(): void - открывает.
+- close(): void - закрывает.
+
+## 4.Класс ProductCard.
+# Конструктор:
+- constructor(events: IEvents, container: HTMLElement, actions?: ICardActions)
+# ProductCard имеет поля:
+- category: HTMLElement | null - категория.
+- title: HTMLElement - заголовок.
+- image: HTMLImageElement | null - изображение.
+- button: HTMLButtonElement | null - добавление в корзину.
+- price: HTMLElement - цена.
+- data: T | null - данные карточки.
+# Методы ProductCard:
+set category(value: string) - категория.
+set title(value: string) - название.
+set image(value: string) - изображение.
+set price(value: number | null) - цена.
+set buttonText(value: string) - текст кнопки.
+set buttonDisabled(state: boolean) - отключение кнопки.
+
+## 5.Класс CatalogItem.
+# Конструктор:
+- constructor(events: IEvents, container: HTMLElement)
+
+## 6.Класс PreviewItem.
+# Конструктор:
+- constructor(events: IEvents, container: HTMLElement) 
+
+## 7.Класс Basket.
+# Конструктор:
+- constructor(events: IEvents, container: HTMLElement)
+# Basket имеет поля:
+- list: HTMLElement - список товаров.
+- total: HTMLElement - общая сумма.
+- button: HTMLButtonElement - кнопка оформить заказ.
+# Методы Basket:
+- set items(items: HTMLElement[]) - список товаров.
+- set total(value: number) - общая сумма заказа.
+- set buttonDisabled(state: boolean) - отключение кнопки.
+
+## 8.Класс BasketItem.
+# Конструктор:
+constructor(events: IEvents, container: HTMLElement)
+# BasketItem имеет поля:
+- index: HTMLElement - порядковый номер.
+- title: HTMLElement - название.
+- price: HTMLElement - цена.
+- deleteButton: HTMLButtonElement - удаление товара.
+# Методы BasketItem:
+- set index(value: number) - порядковый номер.
+- set title(value: string) - название.
+- set price(value: number | null) - цена.
+
+## 9.Класс OrderForm.
+# Конструктор:
+constructor(events: IEvents, container: HTMLElement)
+# OrderForm имеет поля:
+- _paymentButtons: NodeListOf - выбор оплаты.
+- _addressInput: HTMLInputElement - ввод адреса.
+- _errors: HTMLElement - отображение ошибок валидации (унаследовано от FormComponent).
+- _submitButton: HTMLButtonElement - отправка формы (унаследовано от FormComponent).
+# Методы OrderForm:
+- set payment(value: string) - выбранный способ оплаты.
+- set address(value: string) - адрес в поле ввода.
+- set valid(value: boolean) -  состояние (унаследовано от FormComponent).
+- set errors(value: string[]) - сообщение об ошибках валидации (унаследовано от FormComponent).
+
+## 10.Класс ContactsForm.
+# Конструктор:
+constructor(events: IEvents, container: HTMLElement)
+# ContactsForm имеет поля:
+- _emailInput: HTMLInputElement - почта.
+- _phoneInput: HTMLInputElement - телефон.
+- _errors: HTMLElement - вывод ошибки.
+- _submitButton: HTMLButtonElement - отправить.
+# Методы ContactsForm:
+- set email(value: string) - почта.
+- set phone(value: string) - телефон.
+- set errors(value: string[]) - вывод ошибки.
+- set valid(value: boolean) - отправить.
+
+## 11.Класс Success.
+# Конструктор:
+constructor(events: IEvents, container: HTMLElement)
+# Success имеет поля:
+- _description: HTMLElement - текст с общей стоимостью.
+- _closeButton: HTMLButtonElement - закрыть. 
+# Методы Success:
+- set total(value: number) - общая стоимость.
