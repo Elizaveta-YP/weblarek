@@ -11,11 +11,30 @@ export function isEmpty(value: any): boolean {
 }
 
 export type SelectorCollection<T> = string | NodeListOf<Element> | T[];
+export function getOrCreateElement<T extends HTMLElement>(
+  selector: string,
+  container: HTMLElement,
+  createFn: () => T
+): T {
+  try {
+    return ensureElement<T>(selector, container);
+  } catch (error) {
+    console.warn(`${selector} not found, creating dynamically`);
+    const element = createFn();
+    container.appendChild(element);
+    return element;
+  }
+}
 
-export function ensureAllElements<T extends HTMLElement>(selectorElement: SelectorCollection<T>, context: HTMLElement = document as unknown as HTMLElement): T[] {
+export function ensureAllElements<T extends HTMLElement>(
+    selectorElement: SelectorCollection<T>, 
+    context?: HTMLElement | null
+): T[] {
+    const searchContext = context || document;
     if (isSelector(selectorElement)) {
-        return Array.from(context.querySelectorAll(selectorElement)) as T[];
+        return Array.from(searchContext.querySelectorAll(selectorElement)) as T[];
     }
+
     if (selectorElement instanceof NodeList) {
         return Array.from(selectorElement) as T[];
     }
@@ -136,3 +155,7 @@ export function createElement<
     }
     return element;
 }
+
+
+
+

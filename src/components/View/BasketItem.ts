@@ -6,6 +6,7 @@ interface IBasketItem {
   index: number;
   title: string;
   price: number | null;
+  productId: string;
 }
 
 export class BasketItem extends Component<IBasketItem> {
@@ -14,7 +15,7 @@ export class BasketItem extends Component<IBasketItem> {
   protected _price: HTMLElement;
   protected _deleteButton: HTMLButtonElement;
 
-  constructor(events: IEvents, container: HTMLElement) {
+  constructor(protected events: IEvents, container: HTMLElement) {
     super(container);
 
     this._index = ensureElement<HTMLElement>(".basket__item-index", container);
@@ -27,20 +28,31 @@ export class BasketItem extends Component<IBasketItem> {
 
     this._deleteButton.addEventListener("click", (event: MouseEvent) => {
       event.preventDefault();
-      events.emit("basket:remove", this);
+      const productId = this.container.dataset.productId;
+      if (productId) {
+        this.events.emit("basket:remove", { productId });
+      }
     });
   }
 
   set index(value: number) {
-    this._index.textContent = String(value); 
+    this.setText(this._index, String(value));
   }
 
   set title(value: string) {
-    this._title.textContent = value; 
+    this.setText(this._title, value);
   }
 
   set price(value: number | null) {
     const priceText = value !== null ? `${value} синапсов` : "Бесценно";
-    this._price.textContent = priceText; 
+    this.setText(this._price, priceText);
+  }
+
+  render(data?: Partial<IBasketItem>): HTMLElement {
+    const element = super.render(data);
+    if (data?.productId) {
+      element.dataset.productId = data.productId;
+    }
+    return element;
   }
 }

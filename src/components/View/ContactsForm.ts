@@ -1,6 +1,6 @@
-import { ensureElement } from "../../utils/utils";
+import { getOrCreateElement } from "../../utils/utils";
 import { IEvents } from "../base/Events";
-import { FormComponent } from "./FormComponent";
+import { Form } from "./FormComponent";
 
 interface IContactsForm {
   email: string;
@@ -9,33 +9,55 @@ interface IContactsForm {
   errors: string[];
 }
 
-export class ContactsForm extends FormComponent<IContactsForm> {
+export class ContactsForm extends Form<IContactsForm> {
   protected _emailInput: HTMLInputElement;
   protected _phoneInput: HTMLInputElement;
 
   constructor(protected events: IEvents, container: HTMLElement) {
     super(container);
+     this._form.setAttribute('novalidate', 'novalidate');
 
-    this._emailInput = ensureElement<HTMLInputElement>(
+    this._emailInput = getOrCreateElement<HTMLInputElement>(
       'input[name="email"]',
-      container
-    );
-    this._phoneInput = ensureElement<HTMLInputElement>(
-      'input[name="phone"]',
-      container
+      container,
+      () => {
+        const input = document.createElement('input');
+        input.name = 'email';
+        input.type = 'email';
+        input.placeholder = 'Email';
+        input.className = 'input';
+        return input;
+      }
     );
 
-    // Обработчики событий
+    this._phoneInput = getOrCreateElement<HTMLInputElement>(
+      'input[name="phone"]',
+      container,
+      () => {
+        const input = document.createElement('input');
+        input.name = 'phone';
+        input.type = 'tel';
+        input.placeholder = 'Телефон';
+        input.className = 'input';
+        return input;
+      }
+    );
+
     this._emailInput.addEventListener("input", () => {
-      events.emit("contacts.email:change", { email: this._emailInput.value });
+      events.emit("contacts.email:change", {
+        email: this._emailInput.value,
+      });
     });
 
     this._phoneInput.addEventListener("input", () => {
-      events.emit("contacts.phone:change", { phone: this._phoneInput.value });
+      events.emit("contacts.phone:change", {
+        phone: this._phoneInput.value,
+      });
     });
 
-    this._form.addEventListener("submit", (event: Event) => {
+     this._form.addEventListener("submit", (event: Event) => {
       event.preventDefault();
+      console.log('ContactsForm: submit event fired');
       events.emit("contacts:submit");
     });
   }

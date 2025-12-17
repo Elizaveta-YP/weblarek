@@ -1,18 +1,12 @@
 import { Component } from "../base/Component";
 import { ensureElement } from "../../utils/utils";
-import { IEvents } from "../base/Events";
 import { CDN_URL, categoryMap } from "../../utils/constants";
 
-export interface ICardData {
-  id: string;
-  title: string;
-  price: number | null;
-  category: string;
-  image: string;
-  description?: string;
+interface ICardActions {
+  onClick: (event: MouseEvent) => void;
 }
 
-export class Card extends Component<ICardData> {
+export abstract class Card<T> extends Component<T> {
   protected _title: HTMLElement;
   protected _price: HTMLElement;
   protected _category: HTMLElement | null = null;
@@ -20,76 +14,60 @@ export class Card extends Component<ICardData> {
   protected _button: HTMLButtonElement | null = null;
 
   constructor(
-    protected events: IEvents,
     container: HTMLElement,
-    protected action: 'add' | 'remove' // Действие при клике на кнопку
+    actions?: ICardActions
   ) {
     super(container);
-    
+
     this._title = ensureElement<HTMLElement>(".card__title", container);
     this._price = ensureElement<HTMLElement>(".card__price", container);
     this._category = container.querySelector(".card__category");
     this._image = container.querySelector(".card__image");
     this._button = container.querySelector(".card__button");
 
-    // Установка обработчиков событий
-    if (this._button) {
-      this._button.addEventListener('click', (event: MouseEvent) => {
-        event.preventDefault();
-        this.events.emit(`${this.action}:card`, this._container.dataset.id);
-      });
+    if (actions?.onClick) {
+      if (this._button) {
+        this._button.addEventListener("click", actions.onClick);
+      } else {
+        container.addEventListener("click", actions.onClick);
+      }
     }
-
-    this._container.addEventListener('click', () => {
-      this.events.emit('card:select', this._container.dataset.id);
-    });
   }
 
-  // Метод render для обновления отображения
-  render(data?: Partial<ICardData>): HTMLElement {
-    if (data) {
-      this.setValues(data);
-    }
-    return this._container;
+  set title(value: string) {
+    this.setText(this._title, value);
   }
 
-  // Приватный метод для установки значений
-  private setValues(data: Partial<ICardData>): void {
-    if (data.title !== undefined) {
-      this._title.textContent = data.title;
-    }
-    
-    if (data.price !== undefined) {
-      const priceText = data.price !== null ? `${data.price} синапсов` : "Бесценно";
-      this._price.textContent = priceText;
-    }
-    
-    if (data.category !== undefined && this._category) {
-      this._category.textContent = data.category;
-      const categoryClass = categoryMap[data.category as keyof typeof categoryMap] || "card__category_other";
+  set price(value: number | null) {
+    const priceText = value !== null ? `${value} синапсов` : "Бесценно";
+    this.setText(this._price, priceText);
+  }
+
+  set category(value: string) {
+    if (this._category) {
+      this.setText(this._category, value);
+      const categoryClass =
+        categoryMap[value as keyof typeof categoryMap] ||
+        "card__category_other";
       this._category.className = "card__category " + categoryClass;
     }
-    
-    if (data.image !== undefined && this._image) {
-      this._image.src = `${CDN_URL}/${data.image}`;
-      this._image.alt = data.title || '';
-    }
-    
-    if (data.id !== undefined) {
-      this._container.dataset.id = data.id;
+  }
+
+  set image(value: string) {
+    if (this._image) {
+      this._image.src = `${CDN_URL}/${value}`;
     }
   }
 
-  // Управление состоянием кнопки
   set buttonText(value: string) {
     if (this._button) {
-      this._button.textContent = value;
+      this.setText(this._button, value);
     }
   }
 
   set buttonDisabled(state: boolean) {
     if (this._button) {
-      this._button.disabled = state;
+      this.setDisabled(this._button, state);
     }
   }
 }
