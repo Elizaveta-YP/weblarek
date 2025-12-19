@@ -11,12 +11,16 @@ export class PreviewItem extends ProductCard {
         if (this._button) {
             this._button.addEventListener("click", (event: Event) => {
                 event.preventDefault();
-                const productId = container.dataset.productId;
+                const productId = this.container.dataset.productId; 
                 if (productId) {
                     events.emit("product:toggle-basket", { productId });
                 }
             });
         }
+    }
+
+    set productId(value: string) {
+        this.container.dataset.productId = value;
     }
 
     set buttonText(value: string) {

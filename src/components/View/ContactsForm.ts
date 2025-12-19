@@ -1,4 +1,4 @@
-import { getOrCreateElement } from "../../utils/utils";
+import { ensureElement } from "../../utils/utils";
 import { IEvents } from "../base/Events";
 import { Form } from "./FormComponent";
 
@@ -12,36 +12,24 @@ interface IContactsForm {
 export class ContactsForm extends Form<IContactsForm> {
   protected _emailInput: HTMLInputElement;
   protected _phoneInput: HTMLInputElement;
+  protected _errorElement: HTMLElement;
 
   constructor(protected events: IEvents, container: HTMLElement) {
     super(container);
-     this._form.setAttribute('novalidate', 'novalidate');
+    
+    this._form.setAttribute('novalidate', 'novalidate');
 
-    this._emailInput = getOrCreateElement<HTMLInputElement>(
+    this._emailInput = ensureElement<HTMLInputElement>(
       'input[name="email"]',
-      container,
-      () => {
-        const input = document.createElement('input');
-        input.name = 'email';
-        input.type = 'email';
-        input.placeholder = 'Email';
-        input.className = 'input';
-        return input;
-      }
+      container
     );
 
-    this._phoneInput = getOrCreateElement<HTMLInputElement>(
+    this._phoneInput = ensureElement<HTMLInputElement>(
       'input[name="phone"]',
-      container,
-      () => {
-        const input = document.createElement('input');
-        input.name = 'phone';
-        input.type = 'tel';
-        input.placeholder = 'Телефон';
-        input.className = 'input';
-        return input;
-      }
+      container
     );
+
+    this._errorElement = ensureElement<HTMLElement>('.form__errors', container);
 
     this._emailInput.addEventListener("input", () => {
       events.emit("contacts.email:change", {
@@ -55,7 +43,7 @@ export class ContactsForm extends Form<IContactsForm> {
       });
     });
 
-     this._form.addEventListener("submit", (event: Event) => {
+    this._form.addEventListener("submit", (event: Event) => {
       event.preventDefault();
       console.log('ContactsForm: submit event fired');
       events.emit("contacts:submit");
@@ -68,5 +56,19 @@ export class ContactsForm extends Form<IContactsForm> {
 
   set phone(value: string) {
     this._phoneInput.value = value;
+  }
+
+  set valid(state: boolean) {
+    this.setDisabled(this._submitButton, !state);
+  }
+
+  set errors(errors: string[]) {
+    this.setText(this._errorElement, errors.join(', ') || '');
+    this.setValid(this._submitButton, errors.length === 0);
+  }
+
+  setErrors(errors: Record<string, string>) {
+    const errorMessages = Object.values(errors);
+    this.errors = errorMessages;
   }
 }

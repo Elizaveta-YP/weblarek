@@ -42,7 +42,6 @@ export abstract class Form<T> extends Component<T> {
   }
 
 set valid(value: boolean) {
-    console.log('=== Form.valid SETTER CALLED ===');
     console.log('Form class:', this.constructor.name);
     console.log('Value:', value);
     console.log('Submit button:', this._submitButton);

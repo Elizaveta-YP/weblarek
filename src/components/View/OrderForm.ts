@@ -1,4 +1,4 @@
-import { getOrCreateElement } from "../../utils/utils";
+import { ensureElement, ensureAllElements } from "../../utils/utils";
 import { IEvents } from "../base/Events";
 import { Form } from "./FormComponent";
 
@@ -10,52 +10,30 @@ interface IOrderForm {
 }
 
 export class OrderForm extends Form<IOrderForm> {
-  protected _paymentButtons: NodeListOf<HTMLButtonElement>;
+  protected _paymentButtons: HTMLButtonElement[];
   protected _addressInput: HTMLInputElement;
+  protected _errorElement: HTMLElement | null; 
 
   constructor(protected events: IEvents, container: HTMLElement) {
     super(container);
 
-    let buttonsContainer = container.querySelector('.order__buttons');
-    if (!buttonsContainer) {
-      buttonsContainer = document.createElement('div');
-      buttonsContainer.className = 'order__buttons';
-      container.appendChild(buttonsContainer);
-    }
-
-    const buttons = buttonsContainer.querySelectorAll('.button');
-    if (buttons.length === 0) {
-      // Кнопка для оплаты картой
-      const cardButton = document.createElement('button');
-      cardButton.className = 'button button_alt';
-      cardButton.name = 'card';
-      cardButton.textContent = 'Картой';
-      cardButton.type = 'button';
-      buttonsContainer.appendChild(cardButton);
-
-      // Кнопка для оплаты наличными
-      const cashButton = document.createElement('button');
-      cashButton.className = 'button button_alt';
-      cashButton.name = 'cash';
-      cashButton.textContent = 'Наличными';
-      cashButton.type = 'button';
-      buttonsContainer.appendChild(cashButton);
-    }
-
-    this._paymentButtons = buttonsContainer.querySelectorAll('.button');
-
-    this._addressInput = getOrCreateElement<HTMLInputElement>(
-      'input[name="address"]',
-      container,
-      () => {
-        const input = document.createElement('input');
-        input.name = 'address';
-        input.type = 'text';
-        input.placeholder = 'Адрес доставки';
-        input.className = 'input';
-        return input;
-      }
+    const paymentButtons = ensureAllElements<HTMLButtonElement>(
+      '.order__buttons .button_alt',
+      container
     );
+    
+    this._paymentButtons = Array.from(paymentButtons);
+    
+    this._addressInput = ensureElement<HTMLInputElement>(
+      'input[name="address"]',
+      container
+    );
+    
+    this._errorElement = container.querySelector('.order__errors');
+
+    if (this._paymentButtons.length === 0) {
+      throw new Error('Кнопки оплаты не найдены в шаблоне OrderForm');
+    }
 
     this._paymentButtons.forEach((button) => {
       button.addEventListener("click", () => {
@@ -88,10 +66,25 @@ export class OrderForm extends Form<IOrderForm> {
   set address(value: string) {
     this._addressInput.value = value;
   }
+
+  set valid(state: boolean) {
+    this.setDisabled(this._submitButton, !state);
+  }
+
+  set errors(errors: string[]) {
+    if (this._errorElement) {
+      this.setText(this._errorElement, errors.join(', ') || '');
+    }
+    this.setValid(this._submitButton, errors.length === 0);
+  }
+
+  setErrors(errors: Record<string, string>) {
+    const errorMessages = Object.values(errors);
+    this.errors = errorMessages;
+  }
+
   render(): HTMLElement {
     console.log('OrderForm.render() called');
-    console.log('Container:', this.container);
-    console.log('Container is HTMLElement:', this.container instanceof HTMLElement);
     return this.container;
-}
+  }
 }

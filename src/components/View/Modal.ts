@@ -1,4 +1,4 @@
-import { getOrCreateElement } from "../../utils/utils";
+import { ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
 
@@ -13,39 +13,13 @@ export class Modal extends Component<IModalData> {
   constructor(protected events: IEvents, container: HTMLElement) {
     super(container);
     
-    this._closeButton = getOrCreateElement<HTMLButtonElement>(
-      ".modal__close",
-      this.container,
-      () => {
-        const button = document.createElement('button');
-        button.className = 'modal__close';
-        button.innerHTML = '&times;'; 
-        return button;
-      }
-    );
-    
-    this._content = getOrCreateElement<HTMLElement>(
-      ".modal__content",
-      this.container,
-      () => {
-        const content = document.createElement('div');
-        content.className = 'modal__content';
-        return content;
-      }
-    );
+    this._closeButton = ensureElement<HTMLButtonElement>(".modal__close", this.container);
+    this._content = ensureElement<HTMLElement>(".modal__content", this.container);
 
     this._closeButton.addEventListener("click", () => this.close());
     this.container.addEventListener("click", (event) => {
       if (event.target === this.container) {
         this.close();
-      }
-    });
-
-    events.on("modal:force-close", () => {
-      if (this.isOpen) {
-        this.container.classList.remove("modal_active");
-        // this._content.innerHTML = "";//причина неактивной кнопки, нужно запомнить!!!!!!!!!!!!!//
-        this.events.emit('modal:close');
       }
     });
   }

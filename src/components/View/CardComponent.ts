@@ -1,5 +1,5 @@
 import { Component } from "../base/Component";
-import { ensureElement } from "../../utils/utils";
+import { ensureElement, ensureAllElements } from "../../utils/utils";
 import { CDN_URL, categoryMap } from "../../utils/constants";
 
 interface ICardActions {
@@ -21,9 +21,15 @@ export abstract class Card<T> extends Component<T> {
 
     this._title = ensureElement<HTMLElement>(".card__title", container);
     this._price = ensureElement<HTMLElement>(".card__price", container);
-    this._category = container.querySelector(".card__category");
-    this._image = container.querySelector(".card__image");
-    this._button = container.querySelector(".card__button");
+    
+    const categoryElements = ensureAllElements<HTMLElement>(".card__category", container);
+    this._category = categoryElements[0] || null;
+    
+    const imageElements = ensureAllElements<HTMLImageElement>(".card__image", container);
+    this._image = imageElements[0] || null;
+    
+    const buttonElements = ensureAllElements<HTMLButtonElement>(".card__button", container);
+    this._button = buttonElements[0] || null;
 
     if (actions?.onClick) {
       if (this._button) {
@@ -42,7 +48,7 @@ export abstract class Card<T> extends Component<T> {
     const priceText = value !== null ? `${value} синапсов` : "Бесценно";
     this.setText(this._price, priceText);
   }
-
+  
   set category(value: string) {
     if (this._category) {
       this.setText(this._category, value);

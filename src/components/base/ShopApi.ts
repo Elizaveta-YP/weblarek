@@ -1,15 +1,14 @@
-import { IApi, IOrderRequest, IOrderResponse, ProductCatalog } from "../../types";
+import { Api } from './Api';
+import { IProductListResponse, IOrderRequest, IOrderResponse } from '../../types';
 
 export class ShopApi {
-    constructor(private api: IApi) {
-        this.api = api; 
+    constructor(private api: Api) {}
+
+    getProducts(): Promise<IProductListResponse> {
+        return this.api.get('/product');
     }
 
-    async getProduct(): Promise<ProductCatalog[]> {
-        const response = await this.api.get<{ total: number; items: ProductCatalog[] }>('/product/');
-        return response.items; 
+    sendOrder(order: IOrderRequest): Promise<IOrderResponse> {
+        return this.api.post('/order', order, 'POST');
     }
-    createOrder(order: IOrderRequest): Promise<IOrderResponse> {
-        return this.api.post('/order/', order);
-    }
-    }
+}

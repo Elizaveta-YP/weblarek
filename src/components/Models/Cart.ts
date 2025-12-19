@@ -13,8 +13,11 @@ export class Cart {
 
     // добавление товара в массив корзины.
     addItem(product: ProductCatalog): void {
+        if (this.hasItem(product.id)) {
+            return; 
+        }
+        
         this.items.push(product);
-        this.events.emit('basket:item-added', { product });
         this.events.emit('basket:changed', { 
             items: this.getItems(), 
             total: this.getTotal(),
@@ -25,25 +28,23 @@ export class Cart {
     // удаление товара из массива корзины.
     remove(id: string): void {
         const removedItem = this.items.find(item => item.id === id);
+        
+        if (!removedItem) {
+            return; 
+        }
+        
         this.items = this.items.filter(item => item.id !== id);
         
-        if (removedItem) {
-            this.events.emit('basket:item-removed', { 
-                productId: id, 
-                product: removedItem 
-            });
-            this.events.emit('basket:changed', { 
-                items: this.getItems(), 
-                total: this.getTotal(),
-                count: this.getCount()
-            });
-        }
+        this.events.emit('basket:changed', { 
+            items: this.getItems(), 
+            total: this.getTotal(),
+            count: this.getCount()
+        });
     }
 
     // очистка корзины.
     clear(): void {
         this.items = [];
-        this.events.emit('basket:cleared');
         this.events.emit('basket:changed', { 
             items: [], 
             total: 0,
@@ -63,7 +64,7 @@ export class Cart {
         return this.items.length;
     }
 
-    // проверка наличия товара в корзине по его id, полученного в параметр метода.
+    // проверка наличия товара в корзине по его id.
     hasItem(id: string): boolean {
         return this.items.some(item => item.id === id);
     }

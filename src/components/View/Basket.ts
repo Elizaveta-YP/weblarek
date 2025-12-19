@@ -1,6 +1,5 @@
 import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
-import { getOrCreateElement } from "../../utils/utils";
 
 interface IBasket {
   items: HTMLElement[];
@@ -9,59 +8,24 @@ interface IBasket {
 }
 
 export class Basket extends Component<IBasket> {
-  protected _list!: HTMLElement;
-  protected _total!: HTMLElement;
-  protected _button!: HTMLButtonElement;
+  protected _list: HTMLElement;
+  protected _total: HTMLElement;
+  protected _button: HTMLButtonElement;
 
-  constructor(protected events: IEvents, container?: HTMLElement | null) {
-    super(container || Basket.createContainer());
+  constructor(protected events: IEvents, container: HTMLElement) {
+    super(container);
     
-    if (!this.container.parentElement) {
-      document.body.appendChild(this.container);
+    this._list = this.container.querySelector('.basket__list') as HTMLElement;
+    this._total = this.container.querySelector('.basket__price') as HTMLElement;
+    this._button = this.container.querySelector('.basket__button') as HTMLButtonElement;
+    
+    if (!this._list || !this._total || !this._button) {
+      throw new Error('Не все необходимые элементы найдены в шаблоне корзины');
     }
-    
-    this.initElements();
-  }
 
-  private static createContainer(): HTMLElement {
-    const container = document.createElement('div');
-    container.className = 'basket';
-    return container;
-  }
-
-   private initElements() {
-    this._list = getOrCreateElement<HTMLElement>(
-      '.basket__list',
-      this.container,
-      () => {
-        const el = document.createElement('ul');
-        el.className = 'basket__list';
-        return el;
-      }
-    );
-
-    this._total = getOrCreateElement<HTMLElement>(
-      '.basket__price',
-      this.container,
-      () => {
-        const el = document.createElement('span');
-        el.className = 'basket__price';
-        el.textContent = '0 синапсов';
-        return el;
-      }
-    );
-
-    this._button = getOrCreateElement<HTMLButtonElement>(
-      '.basket__button',
-      this.container,
-      () => {
-        const el = document.createElement('button');
-        el.className = 'basket__button';
-        el.textContent = 'Оформить';
-        el.disabled = true;
-        return el;
-      }
-    );
+    this.items = [];
+    this.total = 0;
+    this.buttonDisabled = true;
     
     this._button.addEventListener("click", () => {
       this.events.emit("order:open");

@@ -1,4 +1,4 @@
-import { getOrCreateElement } from "../../utils/utils";
+import { ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/Events"; 
 
@@ -10,47 +10,22 @@ export class Success extends Component<ISuccess> {
   protected _description: HTMLElement;
   protected _closeButton: HTMLButtonElement;
 
-  constructor(events: IEvents, container?: HTMLElement | null) {
-    const actualContainer = container instanceof HTMLElement 
-      ? container 
-      : Success.createContainer();
+  constructor(events: IEvents, container: HTMLElement) {
+    super(container);
     
-    super(actualContainer);
-    
-    if (!this.container.parentElement) {
-      document.body.appendChild(this.container);
-    }
-    
-    this._description = getOrCreateElement<HTMLElement>(
+    this._description = ensureElement<HTMLElement>(
       '.order-success__description',
-      this.container,
-      () => {
-        const el = document.createElement('p');
-        el.className = 'order-success__description';
-        return el;
-      }
+      this.container
     );
     
-    this._closeButton = getOrCreateElement<HTMLButtonElement>(
+    this._closeButton = ensureElement<HTMLButtonElement>(
       '.order-success__close',
-      this.container,
-      () => {
-        const el = document.createElement('button');
-        el.className = 'order-success__close';
-        el.textContent = 'Закрыть';
-        return el;
-      }
+      this.container
     );
     
     this._closeButton.addEventListener('click', () => {
       events.emit('success:close');
     });
-  }
-
-  private static createContainer(): HTMLElement {
-    const container = document.createElement('div');
-    container.className = 'order-success';
-    return container;
   }
 
   set total(value: number) {

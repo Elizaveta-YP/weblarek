@@ -10,17 +10,20 @@ export class Buyer {
 
     setBuyerNotis(data: Partial<BuyerType>): void {
         this.data = { ...this.data, ...data };
-        this.events.emit('buyer:changed', { data: this.data });
+        this.events.emit('order:update');
     }
 
     getBuyerNotis(): Partial<BuyerType> {
         return { ...this.data };
     }
 
+    getData(): Partial<BuyerType> {
+        return this.getBuyerNotis();
+    }
+
     clearBuyerNotis(): void {
         this.data = {};
-        this.events.emit('buyer:cleared');
-        this.events.emit('buyer:changed', { data: {} });
+        this.events.emit('order:update');
     }
 
     validateOrderForm(): ValidationErrors {
@@ -32,8 +35,6 @@ export class Buyer {
 
     validateContactsForm(): ValidationErrors {
         const errors: ValidationErrors = {};
-        if (!this.data.email) errors.email = 'Укажите email';
-        if (!this.data.phone) errors.phone = 'Укажите номер телефона';
         return errors;
     }
 
@@ -42,6 +43,10 @@ export class Buyer {
             ...this.validateOrderForm(),
             ...this.validateContactsForm()
         };
+    }
+
+    validate(): ValidationErrors {
+        return this.validateAll();
     }
 
     isOrderFormValid(): boolean {
