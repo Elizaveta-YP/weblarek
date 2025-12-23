@@ -45,7 +45,6 @@ export class ContactsForm extends Form<IContactsForm> {
 
     this._form.addEventListener("submit", (event: Event) => {
       event.preventDefault();
-      console.log('ContactsForm: submit event fired');
       events.emit("contacts:submit");
     });
   }

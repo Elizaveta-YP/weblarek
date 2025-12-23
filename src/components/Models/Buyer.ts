@@ -34,9 +34,26 @@ export class Buyer {
     }
 
     validateContactsForm(): ValidationErrors {
-        const errors: ValidationErrors = {};
-        return errors;
+    const errors: ValidationErrors = {};
+    if (!this.data.email) {
+        errors.email = 'Укажите email';
+    } else if (!this.data.email.includes('@') || !this.data.email.includes('.')) {
+        errors.email = 'Некорректный email адрес';
     }
+    
+    if (!this.data.phone) {
+        errors.phone = 'Укажите телефон';
+    } else {
+        const phoneDigits = this.data.phone.replace(/\D/g, '');
+        if (phoneDigits.length < 11) {
+            errors.phone = 'Некорректный номер телефона';
+        } else if (phoneDigits.length > 11) {
+            errors.phone = 'Некорректный номер телефона';
+        }
+    }
+    
+    return errors;
+}
 
     validateAll(): ValidationErrors {
         return {

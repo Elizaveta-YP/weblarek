@@ -42,12 +42,8 @@ export class ProductCard extends Component<IProductCardData> {
           actions.onClick!(event);
         }
       };
-
-      if (this._image) {
-        this._image.addEventListener("click", clickHandler);
-      } else {
-        container.addEventListener("click", clickHandler);
-      }
+      
+      container.addEventListener("click", clickHandler);
     }
   }
 

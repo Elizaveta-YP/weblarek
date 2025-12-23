@@ -29,7 +29,8 @@ export class OrderForm extends Form<IOrderForm> {
       container
     );
     
-    this._errorElement = container.querySelector('.order__errors');
+    this._errorElement = ensureElement<HTMLElement>('.form__errors', container);  
+  
 
     if (this._paymentButtons.length === 0) {
       throw new Error('Кнопки оплаты не найдены в шаблоне OrderForm');
@@ -84,7 +85,6 @@ export class OrderForm extends Form<IOrderForm> {
   }
 
   render(): HTMLElement {
-    console.log('OrderForm.render() called');
     return this.container;
   }
 }
